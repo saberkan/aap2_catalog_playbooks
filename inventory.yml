@@ -1,0 +1,7 @@
+---
+all:
+  children:
+    execution_node:
+      hosts:
+        localhost:
+...

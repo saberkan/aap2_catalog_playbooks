@@ -1,0 +1,24 @@
+- name: Deploy VM
+  hosts: all
+  tasks: 
+  - name: Deploy VM
+    redhat.openshift.k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: todelete
+          namespace: aap2-workspace
+          labels:
+            app: galaxy
+            service: web
+        spec:
+          selector:
+            app: galaxy
+            service: web
+          ports:
+          - protocol: TCP
+            targetPort: 8000
+            name: port-8000-tcp
+            port: 8000
