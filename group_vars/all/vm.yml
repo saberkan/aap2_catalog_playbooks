@@ -1,0 +1,17 @@
+---
+vm_name: test-vm
+namespace: aap2-workspace
+vm_template: rhel8-server-small
+datasource_name: rhel8
+storage_size: 30
+flavor: small 
+size: small
+workload: server
+cores: 2
+sockets: 1
+threads: 1
+memory: 4
+hostname: test-vm
+user: test
+password: test
+...

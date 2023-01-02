@@ -5,20 +5,91 @@
     redhat.openshift.k8s:
       state: present
       definition:
-        apiVersion: v1
-        kind: Service
+        apiVersion: kubevirt.io/v1
+        kind: VirtualMachine
         metadata:
-          name: todelete
-          namespace: aap2-workspace
+          name: "{{ vm_name }}"
+          namespace: "{{ namespace }}"
           labels:
-            app: galaxy
-            service: web
+            app: catalog-vm
+            vm.kubevirt.io/template: "{{ vm_template }}"
+            vm.kubevirt.io/template.namespace: openshift
+            vm.kubevirt.io/template.revision: '1'
+            vm.kubevirt.io/template.version: v0.23.4
         spec:
-          selector:
-            app: galaxy
-            service: web
-          ports:
-          - protocol: TCP
-            targetPort: 8000
-            name: port-8000-tcp
-            port: 8000
+          dataVolumeTemplates:
+            - metadata:
+                creationTimestamp: null
+                name: "{{ vm_name }}"
+                namespace: aap2-workspace
+              spec:
+                preallocation: false
+                sourceRef:
+                  kind: DataSource
+                  name: "{{ datasource_name }}"
+                  namespace: openshift-virtualization-os-images
+                storage:
+                  resources:
+                    requests:
+                      storage: "{{ storage_size  }}Gi"
+                  storageClassName: sno-storage
+          running: true
+          template:
+            metadata:
+              annotations:
+                vm.kubevirt.io/flavor: "{{ flavor }}"
+                vm.kubevirt.io/os: rhel8
+                vm.kubevirt.io/workload: "{{ workload }}"
+              creationTimestamp: null
+              labels:
+                kubevirt.io/domain: "{{ vm_name }}"
+                kubevirt.io/size: "{{ size }}"
+            spec:
+              domain:
+                cpu:
+                  cores: "{{ cores }}"
+                  sockets: "{{ sockets }}"
+                  threads: "{{ threads }}"
+                devices:
+                  disks:
+                    - bootOrder: 1
+                      disk:
+                        bus: virtio
+                      name: rootdisk
+                    - bootOrder: 2
+                      disk:
+                        bus: virtio
+                      name: cloudinitdisk
+                  interfaces:
+                    - masquerade: {}
+                      name: default
+                  networkInterfaceMultiqueue: true
+                  rng: {}
+                machine:
+                  type: pc-q35-rhel8.6.0
+                resources:
+                  requests:
+                    memory: "{{ memory }}Gi"
+              evictionStrategy: LiveMigrate
+              networks:
+                - name: default
+                  pod: {}
+              terminationGracePeriodSeconds: 180
+              volumes:
+                - dataVolume:
+                    name: "{{ vm_name }}"
+                  name: rootdisk
+                - cloudInitConfigDrive:
+                    userData: |-
+                      #cloud-config
+                      users:
+                        - name: "{{ user }}"
+                          shell: /bin/bash
+                          sudo: ['ALL=(ALL) NOPASSWD:ALL']
+                      ssh_pwauth: True
+                      chpasswd:
+                        list: |
+                          "{{ user }}:{{ password }}"
+                        expire: false
+                      hostname: "{{ hostname }}"
+                  name: cloudinitdisk
