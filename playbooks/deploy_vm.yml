@@ -80,16 +80,18 @@
                     name: "{{ vm_name }}"
                   name: rootdisk
                 - cloudInitConfigDrive:
-                    userData: |-
+                    userData: >-
                       #cloud-config
+
                       users:
                         - name: "{{ user }}"
                           shell: /bin/bash
                           sudo: ['ALL=(ALL) NOPASSWD:ALL']
                       ssh_pwauth: True
+
                       chpasswd:
                         list: |
                           "{{ user }}:{{ password }}"
                         expire: false
                       hostname: "{{ hostname }}"
-                  name: cloudinitdisk
+                  name: cloudinitdisk 
