@@ -81,6 +81,7 @@
                   name: rootdisk
                 - cloudInitConfigDrive:
                     userData: >-
+
                       ssh_pwauth: True
 
                       users:
