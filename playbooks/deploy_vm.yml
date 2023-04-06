@@ -80,17 +80,15 @@
                     name: "{{ vm_name }}"
                   name: rootdisk
                 - cloudInitConfigDrive:
-                    userData: >-
-                    
+                    userData: |-  
                       ssh_pwauth: True
-                      
                       users:
-                        - name: "{{ user }}"
+                        - name: "ansible"
                           shell: /bin/bash
                           sudo: ['ALL=(ALL) NOPASSWD:ALL']
                       chpasswd:
                         list: |
-                          "{{ user }}:{{ password }}"
+                          "ansible:ansible"
                         expire: False
-                      hostname: "{{ hostname }}"
-                  name: cloudinitdisk 
+                      hostname: "test-vm"
+                  name: cloudinitdisk
