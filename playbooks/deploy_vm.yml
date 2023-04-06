@@ -82,16 +82,14 @@
                 - cloudInitConfigDrive:
                     userData: >-
                       #cloud-config
-
+                      ssh_pwauth: True
                       users:
                         - name: "{{ user }}"
                           shell: /bin/bash
                           sudo: ['ALL=(ALL) NOPASSWD:ALL']
-                      ssh_pwauth: True
-
                       chpasswd:
                         list: |
                           "{{ user }}:{{ password }}"
-                        expire: false
+                        expire: False
                       hostname: "{{ hostname }}"
                   name: cloudinitdisk 
