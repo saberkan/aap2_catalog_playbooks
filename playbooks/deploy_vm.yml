@@ -80,7 +80,7 @@
                     name: "{{ vm_name }}"
                   name: rootdisk
                 - cloudInitConfigDrive:
-                    userData: |-  
+                    userData: |-
                       ssh_pwauth: True
                       users:
                         - name: "ansible"
