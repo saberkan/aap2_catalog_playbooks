@@ -81,9 +81,9 @@
                   name: rootdisk
                 - cloudInitConfigDrive:
                     userData: >-
-
+                    
                       ssh_pwauth: True
-
+                      
                       users:
                         - name: "{{ user }}"
                           shell: /bin/bash
