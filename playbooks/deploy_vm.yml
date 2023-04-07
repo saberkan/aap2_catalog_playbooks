@@ -1,31 +1,35 @@
-kind: Secret
-apiVersion: v1
-metadata:
-  name: "{{ vm_name }}-startup-script"
-  namespace: "{{ namespace }}"
-stringData:
-  userdata: |
-    #!/bin/bash
-
-    # Variables
-    export NEW_USER="{{ user }}"
-    export PASSWORD="{{ password }}"
-    export SSH_PUB_KEY="{{ ssh_pub_key }}""
-
-    # Change user password and ssh cert for authent
-    sudo adduser -U -m $NEW_USER
-    echo "$NEW_USER:$PASSWORD" | chpasswd
-    sudo mkdir /home/$NEW_USER/.ssh
-    sudo echo "$SSH_PUB_KEY" > /home/$NEW_USER/.ssh/authorized_keys
-    sudo chown -R ${NEW_USER}: /home/$NEW_USER/.ssh
-
-    # Make sudoer passwordless
-    sudo usermod -aG wheel $NEW_USER
-    sudo echo -e "$NEW_USER\tALL=(ALL)\tNOPASSWD: ALL" > /etc/sudoers.d/020_$NEW_USER
 ---
-- name: Deploy VM
+- name: Deploy VM with user and ssh access
   hosts: all
   tasks: 
+  - name: Deploy user credentials secret
+    redhat.openshift.k8s:
+      state: present
+      definition:
+        kind: Secret
+        apiVersion: v1
+        metadata:
+          name: "{{ vm_name }}-startup-script"
+          namespace: "{{ namespace }}"
+        stringData:
+          userdata: |
+            #!/bin/bash
+
+            # Variables
+            export NEW_USER="{{ user }}"
+            export PASSWORD="{{ password }}"
+            export SSH_PUB_KEY="{{ ssh_pub_key }}""
+
+            # Change user password and ssh cert for authent
+            sudo adduser -U -m $NEW_USER
+            echo "$NEW_USER:$PASSWORD" | chpasswd
+            sudo mkdir /home/$NEW_USER/.ssh
+            sudo echo "$SSH_PUB_KEY" > /home/$NEW_USER/.ssh/authorized_keys
+            sudo chown -R ${NEW_USER}: /home/$NEW_USER/.ssh
+
+            # Make sudoer passwordless
+            sudo usermod -aG wheel $NEW_USER
+            sudo echo -e "$NEW_USER\tALL=(ALL)\tNOPASSWD: ALL" > /etc/sudoers.d/020_$NEW_USER
   - name: Deploy VM
     redhat.openshift.k8s:
       state: present
@@ -108,23 +112,26 @@ stringData:
                     secretRef:
                       name: "{{ vm_name }}-startup-script"
                   name: cloudinitdisk
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: "{{ vm_name }}"
-  namespace: "{{ namespace }}"
-spec:
-  ipFamilies:
-    - IPv4
-  ports:
-    - name: ssh
-      protocol: TCP
-      port: 22
-      targetPort: 22
-  internalTrafficPolicy: Cluster
-  type: ClusterIP
-  ipFamilyPolicy: SingleStack
-  sessionAffinity: None
-  selector:
-    vm.kubevirt.io/name: "{{ vm_name }}"
+  - name: Deploy ssh service
+    redhat.openshift.k8s:
+      state: present
+      definition:
+        kind: Service
+        apiVersion: v1
+        metadata:
+          name: "{{ vm_name }}"
+          namespace: "{{ namespace }}"
+        spec:
+          ipFamilies:
+            - IPv4
+          ports:
+            - name: ssh
+              protocol: TCP
+              port: 22
+              targetPort: 22
+          internalTrafficPolicy: Cluster
+          type: ClusterIP
+          ipFamilyPolicy: SingleStack
+          sessionAffinity: None
+          selector:
+            vm.kubevirt.io/name: "{{ vm_name }}"
