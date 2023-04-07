@@ -4,7 +4,7 @@ metadata:
   name: "{{ vm_name }}-startup-script"
   namespace: "{{ namespace }}"
 stringData:
-  userdata: |-
+  userdata: |
     #!/bin/bash
 
     # Variables
