@@ -18,7 +18,7 @@
             # Variables
             export NEW_USER="{{ user }}"
             export PASSWORD="{{ password }}"
-            export SSH_PUB_KEY="{{ ssh_pub_key }}""
+            export SSH_PUB_KEY="{{ ssh_pub_key }}"
 
             # Change user password and ssh cert for authent
             sudo adduser -U -m $NEW_USER
