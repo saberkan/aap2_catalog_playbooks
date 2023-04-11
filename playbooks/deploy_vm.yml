@@ -19,6 +19,7 @@
             export NEW_USER="{{ user }}"
             export PASSWORD="{{ password }}"
             export SSH_PUB_KEY="{{ ssh_pub_key }}"
+            export HOSTNAME="{{ hostname }}"
 
             # Change user password and ssh cert for authent
             sudo adduser -U -m $NEW_USER
@@ -30,6 +31,9 @@
             # Make sudoer passwordless
             sudo usermod -aG wheel $NEW_USER
             sudo echo -e "$NEW_USER\tALL=(ALL)\tNOPASSWD: ALL" > /etc/sudoers.d/020_$NEW_USER
+            
+            # Set hostname
+            sudo hostnamectl set-hostname $HOSTNAME
   - name: Deploy VM
     redhat.openshift.k8s:
       state: present
