@@ -54,7 +54,7 @@
             - metadata:
                 creationTimestamp: null
                 name: "{{ vm_name }}"
-                namespace: aap2-workspace
+                namespace: "{{ namespace }}"
               spec:
                 preallocation: false
                 sourceRef:
