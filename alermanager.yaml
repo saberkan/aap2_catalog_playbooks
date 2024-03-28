@@ -1,0 +1,53 @@
+global:
+  resolve_timeout: 5m
+inhibit_rules:
+  - equal:
+      - namespace
+      - alertname
+    source_matchers:
+      - severity = critical
+    target_matchers:
+      - severity =~ warning|info
+  - equal:
+      - namespace
+      - alertname
+    source_matchers:
+      - severity = warning
+    target_matchers:
+      - severity = info
+  - equal:
+      - namespace
+    source_matchers:
+      - alertname = InfoInhibitor
+    target_matchers:
+      - severity = info
+receivers:
+  - name: Default
+  - name: Watchdog
+  - name: Critical
+  - name: 'null'
+  - name: ansible_eda
+    webhook_configs:
+      - url: >-
+          https://eda-aap2-workspace.apps.bm1.cloud.saberkan.online:5001/endpoint
+route:
+  group_by:
+    - namespace
+  group_interval: 5m
+  group_wait: 30s
+  receiver: Default
+  repeat_interval: 12h
+  routes:
+    - matchers:
+        - alertname = Watchdog
+      receiver: Watchdog
+    - matchers:
+        - alertname = InfoInhibitor
+      receiver: 'null'
+    - matchers:
+        - severity = critical
+      receiver: Critical
+    - receiver: ansible_eda
+      matchers:
+        - alertname = test-vm-is-shutdown
+        - severity = critical

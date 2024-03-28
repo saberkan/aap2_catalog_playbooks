@@ -1,0 +1,16 @@
+---
+- name: Automatic VM shutdown remediation
+  hosts: all
+  sources:
+    - name: listen for alerts from openshift
+      ansible.eda.alertmanager:
+        host: 0.0.0.0
+        port: 5001
+  rules:
+    - name: VM down
+      condition: event.alert.labels.alertname == "test-vm-is-shutdown" and event.alert.labels.severity == "warning" and  event.alert.status == "firing"
+      action:
+        print_event:
+          pretty: true
+#        run_job_template:
+#          name: 'vm_startup'

@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: vm-is-shutdown
+  namespace: aap2-workspace
+spec:
+  groups:
+    - name: test-vm-is-shutdown
+      rules:
+        - alert: test-vm-is-shutdown
+          expr: 'kubevirt_vm_running_status_last_transition_timestamp_seconds{name="test-vm"} == 0'
+          labels:
+            severity: warning
+
