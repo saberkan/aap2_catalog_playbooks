@@ -28,8 +28,7 @@ receivers:
   - name: 'null'
   - name: ansible_eda
     webhook_configs:
-      - url: >-
-          https://eda-aap2-workspace.apps.bm1.cloud.saberkan.online:5001/endpoint
+      - url: http://vm-shutdown-eda-aap2-workspace.apps.bm1.cloud.saberkan.online
 route:
   group_by:
     - namespace
